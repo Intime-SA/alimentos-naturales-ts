@@ -6,12 +6,10 @@ import Login from "./Login"; // Puedes crear un componente Home si lo necesitas
 const App: React.FC = () => {
   return (
     <Router>
-      <div className="container mx-auto p-4">
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/trakeo" element={<TrakeoAlimentosNaturales />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/trakeo" element={<TrakeoAlimentosNaturales />} />
+      </Routes>
     </Router>
   );
 };

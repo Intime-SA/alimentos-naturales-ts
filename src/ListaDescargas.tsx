@@ -65,56 +65,69 @@ const TrakeoAlimentosNaturales: React.FC = () => {
   };
 
   return (
-    <ul role="list" className="divide-y divide-gray-100">
-      {devices.map((device, index) => (
-        <li key={index} className="flex justify-between gap-x-6 py-5">
-          <div className="flex min-w-0 gap-x-4">
-            <div
-              className="h-12 w-12 flex-none rounded-full flex items-center justify-center"
-              style={{ backgroundColor: getRandomColor() }}
-            >
-              <span className="text-white font-bold">
-                {device.email.charAt(0).toUpperCase()}
-              </span>
+    <div className="p-4">
+      <h2 className="text-lg font-semibold mb-4 text-gray-800">
+        Seguimiento de Dispositivos
+      </h2>
+      <p className="text-sm text-gray-600 mb-4">
+        Aquí puedes ver un registro de los dispositivos que han accedido a
+        nuestra plataforma, incluyendo información sobre su tipo, ubicación y
+        última conexión.
+      </p>
+      <ul role="list" className="divide-y divide-gray-100">
+        {devices.map((device, index) => (
+          <li
+            key={index}
+            className="flex flex-col sm:flex-row justify-between gap-x-6 py-5"
+          >
+            <div className="flex min-w-0 gap-x-4">
+              <div
+                className="h-12 w-12 flex-none rounded-full flex items-center justify-center"
+                style={{ backgroundColor: getRandomColor() }}
+              >
+                <span className="text-white font-bold">
+                  {device.email.charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <div className="min-w-0 flex-auto">
+                <p className="text-sm font-semibold leading-6 text-gray-900">
+                  {device.name}
+                </p>
+                <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                  {device.email}
+                </p>
+                <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                  {device.ipAddress}
+                </p>
+                <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                  {device.location}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-gray-500">
+                  <br />
+                  <time dateTime={device.timestamp?.toDate().toISOString()}>
+                    {convertTimestampToDate(device.timestamp)}
+                  </time>
+                </p>
+              </div>
             </div>
-            <div className="min-w-0 flex-auto">
-              <p className="text-sm font-semibold leading-6 text-gray-900">
-                {device.name}
+            <div className="hidden sm:flex sm:flex-col sm:items-end mt-2 sm:mt-0">
+              <p className="text-sm leading-6 text-gray-900">
+                {device.deviceInfo.deviceType}
               </p>
-              <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                {device.email}
+              <p className="text-sm leading-6 text-gray-900">
+                {device.deviceInfo.language}
               </p>
-              <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                {device.ipAddress}
+              <p className="text-sm leading-6 text-gray-900">
+                {device.deviceInfo.screenResolution}
               </p>
-              <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                {device.location}
+              <p className="text-sm leading-6 text-gray-900">
+                {device.deviceInfo.userAgent}
               </p>
             </div>
-          </div>
-          <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-            <p className="text-sm leading-6 text-gray-900">
-              {device.deviceInfo.deviceType}
-            </p>
-            <p className="text-sm leading-6 text-gray-900">
-              {device.deviceInfo.language}
-            </p>
-            <p className="text-sm leading-6 text-gray-900">
-              {device.deviceInfo.screenResolution}
-            </p>
-            <p className="text-sm leading-6 text-gray-900">
-              {device.deviceInfo.userAgent}
-            </p>
-            <p className="mt-1 text-xs leading-5 text-gray-500">
-              Last seen{" "}
-              <time dateTime={device.timestamp?.toDate().toISOString()}>
-                {convertTimestampToDate(device.timestamp)}
-              </time>
-            </p>
-          </div>
-        </li>
-      ))}
-    </ul>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 
