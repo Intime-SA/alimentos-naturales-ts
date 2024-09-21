@@ -1,23 +1,23 @@
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
-type DeviceInfo = {
+interface DeviceInfo {
   userAgent: string;
   deviceType: string;
   language: string;
   screenResolution: string;
-};
+}
 
 export const getDeviceInfo = async (): Promise<DeviceInfo> => {
   let deviceType = "unknown";
 
-  if (navigator.userAgent) {
-    const userAgentData = await navigator.userAgent.getHighEntropyValues([
+  if (navigator.userAgentData) {
+    const userAgentData = await navigator.userAgentData.getHighEntropyValues([
       "platform",
     ]);
-    deviceType = userAgentData.platform;
+    deviceType = userAgentData.platform || "unknown"; // Asegúrate de manejar el caso donde platform podría ser undefined
   } else {
-    deviceType = navigator.platform;
+    deviceType = navigator.platform; // Fallback para navegadores que no soportan userAgentData
   }
 
   return {

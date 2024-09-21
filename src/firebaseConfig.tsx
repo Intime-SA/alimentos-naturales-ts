@@ -87,19 +87,24 @@ export const loginGoogle = async () => {
 };
 
 // Sign up a new user
+import { FirebaseError } from "firebase/app"; // Importa FirebaseError
+
 export const signUp = async ({ email, password }: UserCredentials) => {
   try {
     const res = await createUserWithEmailAndPassword(auth, email, password);
     console.log("User created:", res);
     return res;
   } catch (err: unknown) {
-    if (err instanceof Error) {
+    if (err instanceof FirebaseError) {
       if (err.code === "auth/email-already-in-use") {
         console.log("Email is already in use");
       } else {
         console.error("Error during sign up:", err.message);
       }
       throw err; // Re-throw to handle in the calling function
+    } else if (err instanceof Error) {
+      // Manejar otros errores genéricos
+      console.error("Unexpected error during sign up:", err.message);
     }
   }
 };
