@@ -11,8 +11,8 @@ type DeviceInfo = {
 export const getDeviceInfo = async (): Promise<DeviceInfo> => {
   let deviceType = "unknown";
 
-  if (navigator.userAgentData) {
-    const userAgentData = await navigator.userAgentData.getHighEntropyValues([
+  if (navigator.userAgent) {
+    const userAgentData = await navigator.userAgent.getHighEntropyValues([
       "platform",
     ]);
     deviceType = userAgentData.platform;
