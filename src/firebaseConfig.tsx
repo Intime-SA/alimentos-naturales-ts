@@ -34,7 +34,6 @@ export const db = initializeFirestore(app, {
     tabManager: persistentMultipleTabManager(),
   }),
 });
-const perf = getPerformance(app);
 
 // Types for user credentials
 interface UserCredentials {
@@ -47,9 +46,11 @@ export const onSignIn = async ({ email, password }: UserCredentials) => {
   try {
     const res = await signInWithEmailAndPassword(auth, email, password);
     return res;
-  } catch (error) {
-    console.error("Error signing in:", error);
-    throw error; // Re-throw to handle in the calling function
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error("Error signing in:", err.message);
+      throw err; // Re-throw to handle in the calling function
+    }
   }
 };
 
@@ -62,8 +63,10 @@ export const logOut = async () => {
     console.log(
       "Successfully logged out and user info cleared from localStorage."
     );
-  } catch (error) {
-    console.error("Error during logout:", error.message);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error("Error during logout:", err.message);
+    }
   }
 };
 
@@ -75,9 +78,11 @@ export const loginGoogle = async () => {
   try {
     const res = await signInWithPopup(auth, googleProvider);
     return res;
-  } catch (error) {
-    console.error("Error during Google login:", error);
-    throw error;
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error("Error during Google login:", err.message);
+      throw err;
+    }
   }
 };
 
@@ -87,13 +92,15 @@ export const signUp = async ({ email, password }: UserCredentials) => {
     const res = await createUserWithEmailAndPassword(auth, email, password);
     console.log("User created:", res);
     return res;
-  } catch (error) {
-    if (error.code === "auth/email-already-in-use") {
-      console.log("Email is already in use");
-    } else {
-      console.error("Error during sign up:", error);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      if (err.code === "auth/email-already-in-use") {
+        console.log("Email is already in use");
+      } else {
+        console.error("Error during sign up:", err.message);
+      }
+      throw err; // Re-throw to handle in the calling function
     }
-    throw error; // Re-throw to handle in the calling function
   }
 };
 
@@ -102,8 +109,10 @@ export const forgotPassword = async (email: string) => {
   try {
     await sendPasswordResetEmail(auth, email);
     console.log("Password reset email sent to:", email);
-  } catch (error) {
-    console.error("Error sending password reset email:", error);
-    throw error;
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error("Error sending password reset email:", err.message);
+      throw err;
+    }
   }
 };
