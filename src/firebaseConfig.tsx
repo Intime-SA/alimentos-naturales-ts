@@ -14,7 +14,6 @@ import {
   persistentLocalCache,
   persistentMultipleTabManager,
 } from "firebase/firestore";
-import { getPerformance } from "firebase/performance";
 
 // Firebase configuration
 const firebaseConfig = {
