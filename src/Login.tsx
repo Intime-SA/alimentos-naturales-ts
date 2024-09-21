@@ -18,6 +18,7 @@ type FormData = z.infer<typeof schema>;
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const [finaly, setFinaly] = useState(false);
+  const [loadingLogo, setLoadingLogo] = useState(true); // Nuevo estado para el logo
 
   const {
     register,
@@ -55,10 +56,26 @@ export default function Login() {
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        {loadingLogo && (
+          // Mostrar CircularProgress mientras el logo carga
+          <div className="flex justify-center items-center h-96">
+            <CircularProgress style={{ height: "100px", width: "100px" }} />
+          </div>
+        )}
+
+        {/* Mostrar el logo cuando haya cargado */}
         <img
           alt="Your Company"
           src="https://firebasestorage.googleapis.com/v0/b/mayoristakaurymdp.appspot.com/o/LogoAlimentosNaturales.png?alt=media&token=45601fed-80f7-41fb-9bdb-803017d341bc"
+          onLoad={() => setLoadingLogo(false)} // Cambiar el estado cuando el logo haya cargado
+          style={{
+            display: loadingLogo ? "none" : "block", // Ocultar el logo hasta que cargue
+            width: "150px",
+            margin: "0 auto", // Centrar el logo horizontalmente
+          }}
+          className="block"
         />
+
         <h2 className="mt-10 text-center text-2xl font-semibold leading-9 tracking-tight text-gray-900">
           Dejanos tus datos para recibir el Catalogo Completo
         </h2>
