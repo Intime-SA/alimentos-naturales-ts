@@ -1,12 +1,19 @@
-import "./App.css";
-import Login from "./Login";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import TrakeoAlimentosNaturales from "./ListaDescargas";
+import Login from "./Login"; // Puedes crear un componente Home si lo necesitas
 
-function App() {
+const App: React.FC = () => {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-100">
-      <Login />
-    </div>
+    <Router>
+      <div className="container mx-auto p-4">
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/trakeo" element={<TrakeoAlimentosNaturales />} />
+        </Routes>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;
