@@ -65,16 +65,27 @@ const TrakeoAlimentosNaturales: React.FC = () => {
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-lg font-semibold mb-4 text-gray-800">
+    <div className="bg-[#2E2E2E] p-4 min-h-screen">
+      <h2 className="text-lg font-semibold mb-4 text-white">
+        {" "}
+        {/* Cambié a blanco para resaltar */}
         Seguimiento de Dispositivos
       </h2>
-      <p className="text-sm text-gray-600 mb-4">
+      <img
+        style={{ width: "30vw" }}
+        src="https://firebasestorage.googleapis.com/v0/b/mayoristakaurymdp.appspot.com/o/Pesta%C3%B1aLogo%2FSinFondoLogo.png?alt=media&token=8a59df40-df50-4c65-8677-43a9fee55622"
+        alt="logo atlantics"
+      />
+      <p className="text-sm text-gray-300 mb-4">
+        {" "}
+        {/* Cambié a un gris claro para mejor contraste */}
         Aquí puedes ver un registro de los dispositivos que han accedido a
-        nuestra plataforma, incluyendo información sobre su tipo, ubicación y
-        última conexión.
+        descargar el catalogo, incluyendo información sobre su tipo, ubicación y
+        horario.
       </p>
-      <ul role="list" className="divide-y divide-gray-100">
+      <ul role="list" className="divide-y divide-gray-600">
+        {" "}
+        {/* Cambié el color del divisor */}
         {devices.map((device, index) => (
           <li
             key={index}
@@ -90,19 +101,23 @@ const TrakeoAlimentosNaturales: React.FC = () => {
                 </span>
               </div>
               <div className="min-w-0 flex-auto">
-                <p className="text-sm font-semibold leading-6 text-gray-900">
+                <p className="text-sm font-semibold leading-6 text-white">
+                  {" "}
+                  {/* Cambié a blanco para resaltar */}
                   {device.name}
                 </p>
-                <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                <p className="mt-1 truncate text-xs leading-5 text-gray-400">
+                  {" "}
+                  {/* Cambié a gris claro */}
                   {device.email}
                 </p>
-                <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                <p className="mt-1 truncate text-xs leading-5 text-gray-400">
                   {device.ipAddress}
                 </p>
-                <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                <p className="mt-1 truncate text-xs leading-5 text-gray-400">
                   {device.location}
                 </p>
-                <p className="mt-1 text-xs leading-5 text-gray-500">
+                <p className="mt-1 text-xs leading-5 text-gray-400">
                   <br />
                   <time dateTime={device.timestamp?.toDate().toISOString()}>
                     {convertTimestampToDate(device.timestamp)}
@@ -111,16 +126,18 @@ const TrakeoAlimentosNaturales: React.FC = () => {
               </div>
             </div>
             <div className="hidden sm:flex sm:flex-col sm:items-end mt-2 sm:mt-0">
-              <p className="text-sm leading-6 text-gray-900">
+              <p className="text-sm leading-6 text-gray-300">
+                {" "}
+                {/* Cambié a gris claro */}
                 {device.deviceInfo.deviceType}
               </p>
-              <p className="text-sm leading-6 text-gray-900">
+              <p className="text-sm leading-6 text-gray-300">
                 {device.deviceInfo.language}
               </p>
-              <p className="text-sm leading-6 text-gray-900">
+              <p className="text-sm leading-6 text-gray-300">
                 {device.deviceInfo.screenResolution}
               </p>
-              <p className="text-sm leading-6 text-gray-900">
+              <p className="text-sm leading-6 text-gray-300">
                 {device.deviceInfo.userAgent}
               </p>
             </div>
