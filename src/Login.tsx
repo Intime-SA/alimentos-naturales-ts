@@ -131,7 +131,7 @@ export default function Login() {
           </div>
         </form>
 
-        <div sty className="mt-10 text-center text-sm text-gray-500">
+        <div className="mt-10 text-center text-sm text-gray-500">
           Anotate y recibis un codigo de descuento <br />
           <a
             href="#"

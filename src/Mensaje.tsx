@@ -20,7 +20,7 @@ export default function Mensaje() {
               Catalogo enviado con exito{" "}
               <span
                 style={{ fontSize: "2rem", marginLeft: "1rem" }}
-                class="material-symbols-outlined"
+                className="material-symbols-outlined"
               >
                 mark_email_read
               </span>
@@ -41,7 +41,7 @@ export default function Mensaje() {
                     marginBottom: "0rem",
                     marginLeft: "0.5rem",
                   }}
-                  class="material-symbols-outlined"
+                  className="material-symbols-outlined"
                 >
                   menu_book
                 </span>
