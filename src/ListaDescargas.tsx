@@ -25,9 +25,24 @@ const TrakeoAlimentosNaturales: React.FC = () => {
       const querySnapshot = await getDocs(
         collection(db, "trakeoAlimentosNaturales")
       );
-      const deviceData = querySnapshot.docs.map(
-        (doc) => ({ id: doc.id, ...doc.data() } as DeviceInfo)
-      );
+      const deviceData = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          deviceInfo: {
+            deviceType: data.deviceInfo.deviceType,
+            language: data.deviceInfo.language,
+            screenResolution: data.deviceInfo.screenResolution,
+            userAgent: data.deviceInfo.userAgent,
+          },
+          email: data.email,
+          ipAddress: data.ipAddress,
+          location: data.location,
+          name: data.name,
+          telefono: data.telefono,
+          timestamp: data.timestamp, // Asegúrate de que sea del tipo correcto
+        } as DeviceInfo;
+      });
       setDevices(deviceData);
     };
 
@@ -56,11 +71,26 @@ const TrakeoAlimentosNaturales: React.FC = () => {
               <p className="mt-1 truncate text-xs leading-5 text-gray-500">
                 {device.email}
               </p>
+              <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                {device.ipAddress}
+              </p>
+              <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                {device.location}
+              </p>
             </div>
           </div>
           <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
             <p className="text-sm leading-6 text-gray-900">
               {device.deviceInfo.deviceType}
+            </p>
+            <p className="text-sm leading-6 text-gray-900">
+              {device.deviceInfo.language}
+            </p>
+            <p className="text-sm leading-6 text-gray-900">
+              {device.deviceInfo.screenResolution}
+            </p>
+            <p className="text-sm leading-6 text-gray-900">
+              {device.deviceInfo.userAgent}
             </p>
             <p className="mt-1 text-xs leading-5 text-gray-500">
               Last seen{" "}
