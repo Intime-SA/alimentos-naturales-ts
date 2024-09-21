@@ -146,7 +146,7 @@ export default function Login() {
             Solicita Oferta (-20% off)
             <span
               style={{ margin: "0.5rem", color: "green" }}
-              class="material-symbols-outlined"
+              className="material-symbols-outlined"
             >
               shoppingmode
             </span>
