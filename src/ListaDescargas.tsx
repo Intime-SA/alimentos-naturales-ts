@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs, Timestamp } from "firebase/firestore";
 import { db } from "./firebaseConfig";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import Avatar from "@mui/material/Avatar";
+import { Chart } from "./Chart";
+import { Switch } from "@/components/ui/switch"; // Asegúrate de que la ruta sea correcta
+// Asegúrate de que la ruta sea correcta
 
-interface DeviceInfo {
+export interface DeviceInfo {
   deviceInfo: {
     deviceType: string;
     language: string;
@@ -10,15 +21,20 @@ interface DeviceInfo {
     userAgent: string;
   };
   email: string;
+  id: string;
   ipAddress: string;
   location: string;
   name: string;
   telefono: string;
-  timestamp: Timestamp; // Mantiene Timestamp para conversión
+  timestamp: Timestamp;
 }
 
 const TrakeoAlimentosNaturales: React.FC = () => {
   const [devices, setDevices] = useState<DeviceInfo[]>([]);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const savedTheme = localStorage.getItem("theme");
+    return savedTheme === "dark";
+  });
 
   useEffect(() => {
     const fetchDevices = async () => {
@@ -40,7 +56,7 @@ const TrakeoAlimentosNaturales: React.FC = () => {
           location: data.location,
           name: data.name,
           telefono: data.telefono,
-          timestamp: data.timestamp, // Asegúrate de que sea del tipo correcto
+          timestamp: data.timestamp,
         } as DeviceInfo;
       });
       setDevices(deviceData);
@@ -49,101 +65,106 @@ const TrakeoAlimentosNaturales: React.FC = () => {
     fetchDevices();
   }, []);
 
-  // Convertir el timestamp a una fecha legible
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDarkMode);
+    localStorage.setItem("theme", isDarkMode ? "dark" : "light");
+  }, [isDarkMode]);
+
   const convertTimestampToDate = (timestamp: Timestamp): string => {
     return timestamp ? new Date(timestamp.seconds * 1000).toLocaleString() : "";
   };
 
-  // Función para generar un color aleatorio
-  const getRandomColor = () => {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  };
-
   return (
-    <div className="bg-[#2E2E2E] p-4 min-h-screen">
-      <h2 className="text-lg font-semibold mb-4 text-white">
-        {" "}
-        {/* Cambié a blanco para resaltar */}
-        Seguimiento de Dispositivos
-      </h2>
-      <img
-        style={{ width: "30vw" }}
-        src="https://firebasestorage.googleapis.com/v0/b/mayoristakaurymdp.appspot.com/o/Pesta%C3%B1aLogo%2FSinFondoLogo.png?alt=media&token=8a59df40-df50-4c65-8677-43a9fee55622"
-        alt="logo atlantics"
-      />
-      <p className="text-sm text-gray-300 mb-4">
-        {" "}
-        {/* Cambié a un gris claro para mejor contraste */}
-        Aquí puedes ver un registro de los dispositivos que han accedido a
-        descargar el catalogo, incluyendo información sobre su tipo, ubicación y
-        horario.
-      </p>
-      <ul role="list" className="divide-y divide-gray-600">
-        {" "}
-        {/* Cambié el color del divisor */}
-        {devices.map((device, index) => (
-          <li
-            key={index}
-            className="flex flex-col sm:flex-row justify-between gap-x-6 py-5"
-          >
-            <div className="flex min-w-0 gap-x-4">
-              <div
-                className="h-12 w-12 flex-none rounded-full flex items-center justify-center"
-                style={{ backgroundColor: getRandomColor() }}
-              >
-                <span className="text-white font-bold">
+    <div className="bg-white dark:bg-[#2E2E2E] p-4 min-h-screen">
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "flex-end",
+          paddingRight: "2rem",
+        }}
+      >
+        <Switch
+          id="dark-mode"
+          checked={isDarkMode}
+          onCheckedChange={() => setIsDarkMode((prev) => !prev)}
+        />
+      </div>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-lg font-bold text-black dark:text-white">
+          Seguimiento de Dispositivos
+        </h1>
+        <div>
+          <img
+            alt="Your Company"
+            src="https://firebasestorage.googleapis.com/v0/b/mayoristakaurymdp.appspot.com/o/Pesta%C3%B1aLogo%2FSinFondoLogo.png?alt=media&token=8a59df40-df50-4c65-8677-43a9fee55622"
+            style={{ width: "150px" }}
+            className="block"
+          />
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-start",
+          marginBottom: "1rem",
+          maxHeight: "800px",
+          width: "100%",
+        }}
+      >
+        <Chart devices={devices} />
+      </div>
+
+      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {devices.map((device) => (
+          <Card key={device.id} className="shadow-md">
+            <CardHeader>
+              <div className="flex flex-col items-center justify-center gap-3">
+                <Avatar
+                  sx={{
+                    bgcolor: "#9C27B0",
+                    width: 56,
+                    height: 56,
+                    fontSize: 24,
+                  }}
+                >
                   {device.email.charAt(0).toUpperCase()}
-                </span>
+                </Avatar>
+                <div className="text-center">
+                  <CardTitle className="text-base">{device.name}</CardTitle>
+                  <CardDescription className="text-xs">
+                    {device.email}
+                  </CardDescription>
+                </div>
               </div>
-              <div className="min-w-0 flex-auto">
-                <p className="text-sm font-semibold leading-6 text-white">
-                  {" "}
-                  {/* Cambié a blanco para resaltar */}
-                  {device.name}
-                </p>
-                <p className="mt-1 truncate text-xs leading-5 text-gray-400">
-                  {" "}
-                  {/* Cambié a gris claro */}
-                  {device.email}
-                </p>
-                <p className="mt-1 truncate text-xs leading-5 text-gray-400">
-                  {device.ipAddress}
-                </p>
-                <p className="mt-1 truncate text-xs leading-5 text-gray-400">
-                  {device.location}
-                </p>
-                <p className="mt-1 text-xs leading-5 text-gray-400">
-                  <br />
-                  <time dateTime={device.timestamp?.toDate().toISOString()}>
-                    {convertTimestampToDate(device.timestamp)}
-                  </time>
-                </p>
-              </div>
-            </div>
-            <div className="hidden sm:flex sm:flex-col sm:items-end mt-2 sm:mt-0">
-              <p className="text-sm leading-6 text-gray-300">
-                {" "}
-                {/* Cambié a gris claro */}
-                {device.deviceInfo.deviceType}
+            </CardHeader>
+
+            <CardContent>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                IP: {device.ipAddress}
               </p>
-              <p className="text-sm leading-6 text-gray-300">
-                {device.deviceInfo.language}
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Ubicación: {device.location}
               </p>
-              <p className="text-sm leading-6 text-gray-300">
-                {device.deviceInfo.screenResolution}
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Dispositivo: {device.deviceInfo.deviceType}
               </p>
-              <p className="text-sm leading-6 text-gray-300">
-                {device.deviceInfo.userAgent}
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Resolución: {device.deviceInfo.screenResolution}
               </p>
-            </div>
-          </li>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Idioma: {device.deviceInfo.language}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                <time dateTime={device.timestamp?.toDate().toISOString()}>
+                  {convertTimestampToDate(device.timestamp)}
+                </time>
+              </p>
+            </CardContent>
+          </Card>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
