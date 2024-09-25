@@ -10,8 +10,7 @@ import {
 } from "@/components/ui/card";
 import Avatar from "@mui/material/Avatar";
 import { Chart } from "./Chart";
-import { Switch } from "@/components/ui/switch"; // Asegúrate de que la ruta sea correcta
-// Asegúrate de que la ruta sea correcta
+import { Switch } from "@/components/ui/switch";
 
 export interface DeviceInfo {
   deviceInfo: {
@@ -29,12 +28,23 @@ export interface DeviceInfo {
   timestamp: Timestamp;
 }
 
+interface EnhancedDeviceInfo extends DeviceInfo {
+  deviceCategory: "Mobile" | "Desktop";
+}
+
 const TrakeoAlimentosNaturales: React.FC = () => {
-  const [devices, setDevices] = useState<DeviceInfo[]>([]);
+  const [devices, setDevices] = useState<EnhancedDeviceInfo[]>([]);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     const savedTheme = localStorage.getItem("theme");
     return savedTheme === "dark";
   });
+
+  const getDeviceCategory = (
+    screenResolution: string
+  ): "Mobile" | "Desktop" => {
+    const [width] = screenResolution.split("x").map(Number);
+    return width < 768 ? "Mobile" : "Desktop";
+  };
 
   useEffect(() => {
     const fetchDevices = async () => {
@@ -57,9 +67,15 @@ const TrakeoAlimentosNaturales: React.FC = () => {
           name: data.name,
           telefono: data.telefono,
           timestamp: data.timestamp,
-        } as DeviceInfo;
+          deviceCategory: getDeviceCategory(data.deviceInfo.screenResolution),
+        } as EnhancedDeviceInfo;
       });
-      setDevices(deviceData);
+
+      // Sort devices by timestamp, most recent first
+      const sortedDevices = deviceData.sort(
+        (a, b) => b.timestamp.seconds - a.timestamp.seconds
+      );
+      setDevices(sortedDevices);
     };
 
     fetchDevices();
@@ -76,14 +92,7 @@ const TrakeoAlimentosNaturales: React.FC = () => {
 
   return (
     <div className="bg-white dark:bg-[#2E2E2E] p-4 min-h-screen">
-      <div
-        style={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "flex-end",
-          paddingRight: "2rem",
-        }}
-      >
+      <div className="w-full flex justify-end pr-8">
         <Switch
           id="dark-mode"
           checked={isDarkMode}
@@ -104,69 +113,81 @@ const TrakeoAlimentosNaturales: React.FC = () => {
         </div>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-start",
-          marginBottom: "1rem",
-          maxHeight: "800px",
-          width: "100%",
-        }}
-      >
+      <div className="flex justify-start mb-4 max-h-[800px] w-full">
         <Chart devices={devices} />
       </div>
 
+      <h2 className="text-xl font-semibold mb-4 text-black dark:text-white">
+        Informacion por Usuario:
+      </h2>
       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {devices.map((device) => (
-          <Card key={device.id} className="shadow-md">
-            <CardHeader>
-              <div className="flex flex-col items-center justify-center gap-3">
-                <Avatar
-                  sx={{
-                    bgcolor: "#9C27B0",
-                    width: 56,
-                    height: 56,
-                    fontSize: 24,
-                  }}
-                >
-                  {device.email.charAt(0).toUpperCase()}
-                </Avatar>
-                <div className="text-center">
-                  <CardTitle className="text-base">{device.name}</CardTitle>
-                  <CardDescription className="text-xs">
-                    {device.email}
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-
-            <CardContent>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                IP: {device.ipAddress}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Ubicación: {device.location}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Dispositivo: {device.deviceInfo.deviceType}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Resolución: {device.deviceInfo.screenResolution}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Idioma: {device.deviceInfo.language}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                <time dateTime={device.timestamp?.toDate().toISOString()}>
-                  {convertTimestampToDate(device.timestamp)}
-                </time>
-              </p>
-            </CardContent>
-          </Card>
+          <DeviceCard
+            key={device.id}
+            device={device}
+            convertTimestampToDate={convertTimestampToDate}
+          />
         ))}
       </div>
     </div>
   );
 };
+
+interface DeviceCardProps {
+  device: EnhancedDeviceInfo;
+  convertTimestampToDate: (timestamp: Timestamp) => string;
+}
+
+const DeviceCard: React.FC<DeviceCardProps> = ({
+  device,
+  convertTimestampToDate,
+}) => (
+  <Card className="shadow-md">
+    <CardHeader>
+      <div className="flex flex-col items-center justify-center gap-3">
+        <Avatar
+          sx={{
+            bgcolor: "#9C27B0",
+            width: 56,
+            height: 56,
+            fontSize: 24,
+          }}
+        >
+          {device.email.charAt(0).toUpperCase()}
+        </Avatar>
+        <div className="text-center">
+          <CardTitle className="text-base">{device.name}</CardTitle>
+          <CardDescription className="text-xs">{device.email}</CardDescription>
+        </div>
+      </div>
+    </CardHeader>
+
+    <CardContent>
+      <p className="text-xs text-gray-500 dark:text-gray-400">
+        IP: {device.ipAddress}
+      </p>
+      <p className="text-xs text-gray-500 dark:text-gray-400">
+        Ubicación: {device.location}
+      </p>
+      <p className="text-xs text-gray-500 dark:text-gray-400">
+        Dispositivo: {device.deviceInfo.deviceType}
+      </p>
+      <p className="text-xs text-gray-500 dark:text-gray-400">
+        Categoría: {device.deviceCategory}
+      </p>
+      <p className="text-xs text-gray-500 dark:text-gray-400">
+        Resolución: {device.deviceInfo.screenResolution}
+      </p>
+      <p className="text-xs text-gray-500 dark:text-gray-400">
+        Idioma: {device.deviceInfo.language}
+      </p>
+      <p className="text-xs text-gray-500 dark:text-gray-400">
+        <time dateTime={device.timestamp?.toDate().toISOString()}>
+          {convertTimestampToDate(device.timestamp)}
+        </time>
+      </p>
+    </CardContent>
+  </Card>
+);
 
 export default TrakeoAlimentosNaturales;

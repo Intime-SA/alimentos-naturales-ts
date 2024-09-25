@@ -17,7 +17,8 @@ import {
 } from "@/components/ui/chart";
 import { Timestamp } from "firebase/firestore";
 
-export const description = "An interactive bar chart";
+export const description =
+  "An interactive bar chart showing data from the last 24 hours";
 
 const chartConfig = {
   desktop: {
@@ -54,20 +55,29 @@ export const Chart: React.FC<ChartProps> = ({ devices }) => {
   const [activeChart, setActiveChart] =
     React.useState<keyof typeof chartConfig>("desktop");
 
-  // Process devices data to chart data
+  // Filter devices from the last 24 hours
+  const filteredDevices = React.useMemo(() => {
+    const now = new Date();
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    return devices.filter(
+      (device) => device.timestamp.toDate() > twentyFourHoursAgo
+    );
+  }, [devices]);
+
+  // Process filtered devices data to chart data
   const chartData = React.useMemo(() => {
     const dataMap: { [key: string]: { desktop: number; mobile: number } } = {};
 
-    devices.forEach((device) => {
-      const timestampMillis = device.timestamp.seconds * 1000; // Convert seconds to milliseconds
-      const date = new Date(timestampMillis);
-      const hour = date.getHours(); // Extract the hour (0-23)
-      const hourKey = `${hour}:00`; // Format hour key
+    // Initialize all hours with zero counts
+    for (let i = 0; i < 24; i++) {
+      const hourKey = `${i.toString().padStart(2, "0")}:00`;
+      dataMap[hourKey] = { desktop: 0, mobile: 0 };
+    }
 
-      // Initialize the hour entry if it doesn't exist
-      if (!dataMap[hourKey]) {
-        dataMap[hourKey] = { desktop: 0, mobile: 0 };
-      }
+    filteredDevices.forEach((device) => {
+      const date = device.timestamp.toDate();
+      const hour = date.getHours();
+      const hourKey = `${hour.toString().padStart(2, "0")}:00`;
 
       // Increment the count based on device type
       const deviceType = device.deviceInfo.deviceType.toLowerCase();
@@ -83,18 +93,11 @@ export const Chart: React.FC<ChartProps> = ({ devices }) => {
       }
     });
 
-    // Fill in missing hours with zero counts
-    const fullData = Array.from({ length: 24 }, (_, i) => {
-      const hourKey = `${i}:00`;
-      return {
-        hour: hourKey,
-        desktop: dataMap[hourKey]?.desktop || 0,
-        mobile: dataMap[hourKey]?.mobile || 0,
-      };
-    });
-
-    return fullData;
-  }, [devices]);
+    // Convert dataMap to array and sort by hour
+    return Object.entries(dataMap)
+      .map(([hour, counts]) => ({ hour, ...counts }))
+      .sort((a, b) => a.hour.localeCompare(b.hour));
+  }, [filteredDevices]);
 
   const total = React.useMemo(
     () => ({
@@ -105,11 +108,12 @@ export const Chart: React.FC<ChartProps> = ({ devices }) => {
   );
 
   return (
-    <Card>
+    <Card style={{ width: "100%", maxWidth: "800px", height: "auto" }}>
       <CardHeader className="flex flex-col items-stretch border-b p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center px-6 py-5 sm:py-6">
           <CardTitle>
-            Descargas Catalogo - <span style={{ fontWeight: "100" }}>24hs</span>
+            Descargas Catalogo -{" "}
+            <span style={{ fontWeight: "100" }}>Últimas 24hs</span>
           </CardTitle>
           <br />
           <CardDescription>
@@ -134,7 +138,6 @@ export const Chart: React.FC<ChartProps> = ({ devices }) => {
                 <span className="text-xs">{chartConfig[chart].label}</span>
                 <br />
                 <span className="text-lg font-bold">
-                  {" "}
                   {total[chart].toLocaleString()}
                 </span>
               </button>
